@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mohamed SARL — Blog</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0d0d0d;
+  --surface: #161616;
+  --surface2: #1e1e1e;
+  --border: rgba(255,255,255,0.08);
+  --accent: #c9a84c;
+  --accent2: #e8c97a;
+  --text: #f0ede8;
+  --muted: #777;
+  --danger: #c0392b;
+  --success: #27ae60;
+  --radius: 6px;
+  --font-head: 'Playfair Display', serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:15px; min-height:100vh; }
+
+header {
+  background:var(--surface); border-bottom:1px solid var(--border);
+  padding:0 2rem; display:flex; align-items:center;
+  justify-content:space-between; height:64px;
+  position:sticky; top:0; z-index:100;
+}
+.logo { font-family:var(--font-head); font-size:22px; font-weight:700; color:var(--accent); }
+.logo span { color:var(--muted); font-weight:400; font-size:14px; margin-left:8px; font-family:var(--font-body); }
+.status-pill {
+  display:flex; align-items:center; gap:6px; font-size:12px;
+  padding:4px 14px; background:var(--surface2); border:1px solid var(--border);
+  border-radius:99px; color:var(--muted);
+}
+.status-pill .dot { width:7px; height:7px; border-radius:50%; background:var(--muted); transition:all 0.3s; }
+.status-pill.online .dot { background:var(--success); box-shadow:0 0 6px var(--success); }
+.status-pill.online { color:var(--text); }
+.status-pill.offline .dot { background:var(--danger); }
+
+.layout { display:grid; grid-template-columns:220px 1fr; min-height:calc(100vh - 64px); }
+
+aside {
+  background:var(--surface); border-right:1px solid var(--border);
+  padding:1.5rem 0; position:sticky; top:64px;
+  height:calc(100vh - 64px); overflow-y:auto;
+}
+.api-bar { padding:0 1rem 1rem; }
+.api-bar label { font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:5px; }
+.api-bar input {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  color:var(--text); font-family:var(--font-body); font-size:12px;
+  padding:7px 10px; border-radius:var(--radius); outline:none;
+}
+.api-bar input:focus { border-color:var(--accent); }
+aside hr { border:none; border-top:1px solid var(--border); margin:0.5rem 1rem 1rem; }
+.nav-label { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); padding:0 1.5rem; margin-bottom:6px; }
+.nav-item {
+  display:flex; align-items:center; gap:10px; padding:9px 1.5rem;
+  cursor:pointer; font-size:14px; color:var(--muted);
+  transition:all 0.15s; border:none; background:none; width:100%; text-align:left;
+}
+.nav-item:hover { background:var(--surface2); color:var(--text); }
+.nav-item.active { background:rgba(201,168,76,0.1); color:var(--accent); border-right:2px solid var(--accent); }
+
+main { padding:2rem; }
+.page { display:none; animation:fadeIn 0.2s ease; }
+.page.active { display:block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+
+.page-title { font-family:var(--font-head); font-size:28px; font-weight:700; margin-bottom:4px; }
+.page-sub { font-size:14px; color:var(--muted); margin-bottom:1.5rem; }
+
+.stats { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:2rem; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; }
+.stat-lbl { font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:6px; }
+.stat-val { font-family:var(--font-head); font-size:34px; font-weight:700; color:var(--accent); }
+
+.toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; }
+
+.article-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); padding:1.25rem;
+  margin-bottom:10px; transition:border-color 0.15s;
+}
+.article-card:hover { border-color:rgba(201,168,76,0.25); }
+.ac-title { font-family:var(--font-head); font-size:17px; font-weight:600; margin-bottom:5px; }
+.ac-meta { font-size:12px; color:var(--muted); margin-bottom:8px; }
+.ac-meta strong { color:var(--accent); font-weight:500; }
+.ac-body { font-size:13px; color:var(--muted); line-height:1.65; margin-bottom:10px; }
+.ac-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+.tags { display:flex; gap:5px; flex-wrap:wrap; }
+.tag { font-size:11px; padding:2px 10px; border-radius:99px; background:rgba(201,168,76,0.08); color:var(--accent); border:1px solid rgba(201,168,76,0.2); }
+.ac-actions { display:flex; gap:6px; }
+
+.empty-state { text-align:center; padding:3rem; color:var(--muted); border:1px dashed var(--border); border-radius:var(--radius); font-size:14px; }
+.empty-state .ei { font-size:30px; margin-bottom:8px; }
+
+.form-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; max-width:660px; }
+.fg { margin-bottom:14px; }
+.fg label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:6px; }
+.fg input, .fg textarea {
+  width:100%; background:var(--surface2); border:1px solid var(--border);
+  color:var(--text); font-family:var(--font-body); font-size:14px;
+  padding:10px 12px; border-radius:var(--radius); outline:none; transition:border-color 0.15s;
+}
+.fg input:focus, .fg textarea:focus { border-color:var(--accent); }
+.fg textarea { min-height:130px; resize:vertical; }
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.btn {
+  padding:9px 18px; border-radius:var(--radius); font-size:13px;
+  font-family:var(--font-body); cursor:pointer; transition:all 0.15s;
+  border:1px solid var(--border); background:var(--surface2); color:var(--text);
+}
+.btn:hover { background:var(--surface); border-color:rgba(255,255,255,0.15); }
+.btn.primary { background:var(--accent); color:#0d0d0d; border-color:var(--accent); font-weight:500; }
+.btn.primary:hover { background:var(--accent2); border-color:var(--accent2); }
+.btn.danger { color:var(--danger); border-color:rgba(192,57,43,0.25); }
+.btn.danger:hover { background:rgba(192,57,43,0.08); }
+.btn.sm { padding:6px 12px; font-size:12px; }
+
+.search-bar { display:flex; gap:8px; margin-bottom:1rem; }
+.search-bar input {
+  flex:1; background:var(--surface); border:1px solid var(--border);
+  color:var(--text); font-family:var(--font-body); font-size:14px;
+  padding:10px 14px; border-radius:var(--radius); outline:none;
+}
+.search-bar input:focus { border-color:var(--accent); }
+
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:200; align-items:center; justify-content:center; }
+.modal-overlay.open { display:flex; }
+.modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.5rem; width:90%; max-width:540px; }
+.modal-title { font-family:var(--font-head); font-size:20px; margin-bottom:1.25rem; }
+.modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:1rem; }
+
+#toast {
+  position:fixed; bottom:1.5rem; right:1.5rem;
+  padding:10px 18px; border-radius:var(--radius); font-size:13px;
+  background:var(--surface); border:1px solid var(--border); color:var(--text);
+  opacity:0; transform:translateY(8px); transition:all 0.25s; pointer-events:none; z-index:999;
+}
+#toast.show { opacity:1; transform:none; }
+#toast.success { border-color:rgba(39,174,96,0.4); color:#6fcf97; }
+#toast.error { border-color:rgba(192,57,43,0.4); color:#e57373; }
+
+.loader { text-align:center; padding:2rem; color:var(--muted); font-size:13px; }
+
+@media(max-width:700px) {
+  .layout { grid-template-columns:1fr; }
+  aside { display:none; }
+  .stats { grid-template-columns:1fr 1fr; }
+  .form-row { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Mohamed SARL <span>/ Gestion Blog</span></div>
+  <div class="status-pill" id="status-pill">
+    <div class="dot"></div>
+    <span id="status-txt">Vérification...</span>
+  </div>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="api-bar">
+      <label>URL de l'API</label>
+      <input type="text" id="api-base" value="http://localhost:3000/api" oninput="checkStatus()"/>
+    </div>
+    <hr/>
+    <div class="nav-label">Menu</div>
+    <button class="nav-item active" onclick="goto('dashboard')">◈ &nbsp;Tableau de bord</button>
+    <button class="nav-item" onclick="goto('articles')">≡ &nbsp;Tous les articles</button>
+    <button class="nav-item" onclick="goto('create')">+ &nbsp;Nouvel article</button>
+    <button class="nav-item" onclick="goto('search')">⌕ &nbsp;Recherche</button>
+    <button class="nav-item" onclick="goto('filter')">⊟ &nbsp;Filtres avancés</button>
+  </aside>
+
+  <main>
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-title">Tableau de bord</div>
+      <div class="page-sub">Vue d'ensemble — Mohamed SARL Blog</div>
+      <div class="stats">
+        <div class="stat-card"><div class="stat-lbl">Articles publiés</div><div class="stat-val" id="s-total">—</div></div>
+        <div class="stat-card"><div class="stat-lbl">Catégories</div><div class="stat-val" id="s-cats">—</div></div>
+        <div class="stat-card"><div class="stat-lbl">Auteurs</div><div class="stat-val" id="s-authors">—</div></div>
+      </div>
+      <div style="font-size:11px; color:var(--muted); margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.1em;">Derniers articles</div>
+      <div id="dash-list"><div class="loader">Chargement...</div></div>
+    </div>
+
+    <!-- ARTICLES -->
+    <div class="page" id="page-articles">
+      <div class="toolbar">
+        <div>
+          <div class="page-title">Articles</div>
+          <div class="page-sub" id="art-count" style="margin-bottom:0;">—</div>
+        </div>
+        <button class="btn primary" onclick="goto('create')">+ Nouvel article</button>
+      </div>
+      <div id="articles-list"><div class="loader">Chargement...</div></div>
+    </div>
+
+    <!-- CREATE -->
+    <div class="page" id="page-create">
+      <div class="page-title">Nouvel article</div>
+      <div class="page-sub">Remplissez les champs ci-dessous pour publier</div>
+      <div class="form-card">
+        <div class="fg"><label>Titre *</label><input type="text" id="c-titre" placeholder="Titre de l'article"/></div>
+        <div class="fg"><label>Contenu *</label><textarea id="c-contenu" placeholder="Rédigez votre article..."></textarea></div>
+        <div class="form-row">
+          <div class="fg"><label>Auteur *</label><input type="text" id="c-auteur" placeholder="Votre nom"/></div>
+          <div class="fg"><label>Catégorie</label><input type="text" id="c-categorie" placeholder="Tech, Business..."/></div>
+        </div>
+        <div class="fg"><label>Tags</label><input type="text" id="c-tags" placeholder="tag1, tag2, tag3"/></div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn primary" onclick="createArticle()">Publier l'article</button>
+          <button class="btn" onclick="clearCreate()">Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="page" id="page-search">
+      <div class="page-title">Recherche</div>
+      <div class="page-sub">Rechercher dans les titres et contenus</div>
+      <div class="search-bar">
+        <input type="text" id="search-q" placeholder="Mot-clé..." onkeydown="if(event.key==='Enter')searchArticles()"/>
+        <button class="btn primary" onclick="searchArticles()">Rechercher</button>
+      </div>
+      <div id="search-results"><div class="empty-state"><div class="ei">⌕</div>Entrez un terme pour rechercher</div></div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="page" id="page-filter">
+      <div class="page-title">Filtres avancés</div>
+      <div class="page-sub">Filtrer les articles par critère</div>
+      <div class="form-card" style="margin-bottom:1.5rem;">
+        <div class="form-row">
+          <div class="fg"><label>Catégorie</label><input type="text" id="f-cat" placeholder="Tech..."/></div>
+          <div class="fg"><label>Auteur</label><input type="text" id="f-aut" placeholder="Mohamed..."/></div>
+        </div>
+        <div class="fg"><label>Date (YYYY-MM-DD)</label><input type="text" id="f-date" placeholder="2026-03-22"/></div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn primary" onclick="filterArticles()">Appliquer les filtres</button>
+          <button class="btn" onclick="clearFilter()">Effacer</button>
+        </div>
+      </div>
+      <div id="filter-results"><div class="empty-state"><div class="ei">⊟</div>Définissez un filtre et cliquez Appliquer</div></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title">Modifier l'article</div>
+    <input type="hidden" id="e-id"/>
+    <div class="fg"><label>Titre</label><input type="text" id="e-titre"/></div>
+    <div class="fg"><label>Contenu</label><textarea id="e-contenu"></textarea></div>
+    <div class="form-row">
+      <div class="fg"><label>Catégorie</label><input type="text" id="e-categorie"/></div>
+      <div class="fg"><label>Tags</label><input type="text" id="e-tags"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()">Annuler</button>
+      <button class="btn primary" onclick="updateArticle()">Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+function getBase(){return(document.getElementById('api-base').value||'http://localhost:3000/api').replace(/\/$/,'');}
+
+async function api(path,opts={}){
+  try{
+    const r=await fetch(getBase()+path,{headers:{'Content-Type':'application/json'},...opts});
+    const d=await r.json();
+    return{ok:r.ok,status:r.status,data:d};
+  }catch(e){return{ok:false,error:e.message,data:null};}
+}
+
+async function checkStatus(){
+  const pill=document.getElementById('status-pill');
+  const txt=document.getElementById('status-txt');
+  const r=await api('/articles');
+  if(r.ok){pill.className='status-pill online';txt.textContent='API connectée';}
+  else{pill.className='status-pill offline';txt.textContent='Hors ligne';}
+}
+
+function toast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show '+type;
+  setTimeout(()=>t.className='',2800);
+}
+
+function goto(name){
+  const names=['dashboard','articles','create','search','filter'];
+  document.querySelectorAll('.nav-item').forEach((n,i)=>n.classList.toggle('active',names[i]===name));
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='dashboard')loadDashboard();
+  if(name==='articles')loadArticles();
+}
+
+function renderCards(articles,container,limit=0){
+  if(!articles||articles.length===0){
+    container.innerHTML='<div class="empty-state"><div class="ei">∅</div>Aucun article trouvé</div>';return;
+  }
+  const list=limit?articles.slice(0,limit):articles;
+  container.innerHTML=list.map(a=>`
+    <div class="article-card">
+      <div class="ac-title">${a.titre||'—'}</div>
+      <div class="ac-meta">Par <strong>${a.auteur||'?'}</strong>${a.categorie?' · '+a.categorie:''}${a.date?' · '+a.date.split('T')[0]:''}</div>
+      <div class="ac-body">${(a.contenu||'').substring(0,180)}${(a.contenu||'').length>180?'...':''}</div>
+      <div class="ac-footer">
+        <div class="tags">${a.tags?a.tags.split(',').map(t=>'<span class="tag">'+t.trim()+'</span>').join(''):'<span style="color:var(--muted);font-size:12px;">—</span>'}</div>
+        <div class="ac-actions">
+          <button class="btn sm" onclick='openEdit(${JSON.stringify(a)})'>Modifier</button>
+          <button class="btn sm danger" onclick="deleteArticle(${a.id})">Supprimer</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+async function loadDashboard(){
+  document.getElementById('dash-list').innerHTML='<div class="loader">Chargement...</div>';
+  const r=await api('/articles');
+  if(r.ok){
+    const arts=r.data||[];
+    document.getElementById('s-total').textContent=arts.length;
+    document.getElementById('s-cats').textContent=new Set(arts.map(a=>a.categorie).filter(Boolean)).size;
+    document.getElementById('s-authors').textContent=new Set(arts.map(a=>a.auteur).filter(Boolean)).size;
+    renderCards(arts,document.getElementById('dash-list'),3);
+  }else{
+    document.getElementById('dash-list').innerHTML='<div class="empty-state">Impossible de joindre l\'API</div>';
+  }
+}
+
+async function loadArticles(){
+  document.getElementById('articles-list').innerHTML='<div class="loader">Chargement...</div>';
+  const r=await api('/articles');
+  if(r.ok){
+    document.getElementById('art-count').textContent=(r.data||[]).length+' article(s)';
+    renderCards(r.data,document.getElementById('articles-list'));
+  }
+}
+
+async function createArticle(){
+  const body={
+    titre:document.getElementById('c-titre').value.trim(),
+    contenu:document.getElementById('c-contenu').value.trim(),
+    auteur:document.getElementById('c-auteur').value.trim(),
+    categorie:document.getElementById('c-categorie').value.trim(),
+    tags:document.getElementById('c-tags').value.trim()
+  };
+  if(!body.titre||!body.contenu||!body.auteur){toast('Titre, contenu et auteur sont obligatoires','error');return;}
+  const r=await api('/articles',{method:'POST',body:JSON.stringify(body)});
+  if(r.ok){toast('Article publié avec succès !','success');clearCreate();goto('articles');}
+  else toast('Erreur lors de la publication','error');
+}
+
+function clearCreate(){
+  ['c-titre','c-contenu','c-auteur','c-categorie','c-tags'].forEach(id=>document.getElementById(id).value='');
+}
+
+async function deleteArticle(id){
+  if(!confirm('Supprimer définitivement cet article ?'))return;
+  const r=await api('/articles/'+id,{method:'DELETE'});
+  if(r.ok){toast('Article supprimé','success');loadArticles();loadDashboard();}
+  else toast('Erreur lors de la suppression','error');
+}
+
+function openEdit(a){
+  document.getElementById('e-id').value=a.id;
+  document.getElementById('e-titre').value=a.titre||'';
+  document.getElementById('e-contenu').value=a.contenu||'';
+  document.getElementById('e-categorie').value=a.categorie||'';
+  document.getElementById('e-tags').value=a.tags||'';
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeModal(){document.getElementById('edit-modal').classList.remove('open');}
+
+async function updateArticle(){
+  const id=document.getElementById('e-id').value;
+  const body={
+    titre:document.getElementById('e-titre').value.trim(),
+    contenu:document.getElementById('e-contenu').value.trim(),
+    categorie:document.getElementById('e-categorie').value.trim(),
+    tags:document.getElementById('e-tags').value.trim()
+  };
+  const r=await api('/articles/'+id,{method:'PUT',body:JSON.stringify(body)});
+  if(r.ok){toast('Article modifié avec succès','success');closeModal();loadArticles();}
+  else toast('Erreur lors de la modification','error');
+}
+
+async function searchArticles(){
+  const q=document.getElementById('search-q').value.trim();
+  if(!q)return;
+  const r=await api('/articles/search?query='+encodeURIComponent(q));
+  renderCards(r.ok?r.data:[],document.getElementById('search-results'));
+}
+
+async function filterArticles(){
+  const params=new URLSearchParams();
+  const c=document.getElementById('f-cat').value.trim();
+  const a=document.getElementById('f-aut').value.trim();
+  const d=document.getElementById('f-date').value.trim();
+  if(c)params.append('categorie',c);
+  if(a)params.append('auteur',a);
+  if(d)params.append('date',d);
+  const r=await api('/articles?'+params.toString());
+  renderCards(r.ok?r.data:[],document.getElementById('filter-results'));
+}
+
+function clearFilter(){
+  ['f-cat','f-aut','f-date'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('filter-results').innerHTML='<div class="empty-state"><div class="ei">⊟</div>Définissez un filtre et cliquez Appliquer</div>';
+}
+
+document.getElementById('edit-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+checkStatus();
+loadDashboard();
+</script>
+</body>
+</html>
+
