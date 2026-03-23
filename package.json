@@ -9,7 +9,9 @@
   "dependencies": {
     "better-sqlite3": "^9.x.x",
     "dotenv": "^16.x.x",
-    "express": "^4.x.x"
+    "express": "^4.x.x",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.x.x"
