@@ -1,6 +1,17 @@
 # 📰 API-BLOG — Mohamed SARL
 
-Une API REST complète pour la gestion d'articles de blog, construite avec **Node.js**, **Express** et **SQLite** (better-sqlite3). Inclut une interface web intégrée pour interagir avec l'API directement depuis le navigateur.
+Une API REST complète pour la gestion d'articles de blog, construite avec **Node.js**, **Express** et **SQLite** (better-sqlite3). Inclut une interface web intégrée et une documentation Swagger interactive.
+
+---
+
+## 🔗 Liens importants
+
+| Ressource | Lien |
+|-----------|------|
+| 🚀 API en ligne | https://api-blog-production-8f83.up.railway.app/api/articles |
+| 🌐 Interface web | https://api-blog-production-8f83.up.railway.app |
+| 📚 Documentation Swagger | https://api-blog-production-8f83.up.railway.app/api-docs |
+| 💻 Dépôt GitHub | https://github.com/31Mohamed07/api-blog |
 
 ---
 
@@ -15,7 +26,7 @@ API-BLOG/
 ├── models/
 │   └── article.js             # Modèle Article (requêtes SQL)
 ├── routes/
-│   └── articles.js            # Définition des routes Express
+│   └── articles.js            # Routes Express + documentation Swagger
 ├── public/
 │   └── index.html             # Interface web (frontend)
 ├── .env                       # Variables d'environnement
@@ -37,7 +48,7 @@ API-BLOG/
 
 **1. Cloner le projet**
 ```bash
-git clone https://github.com/votre-utilisateur/api-blog.git
+git clone https://github.com/31Mohamed07/api-blog.git
 cd api-blog
 ```
 
@@ -75,6 +86,21 @@ Elle permet de :
 - Lister, créer, modifier et supprimer des articles
 - Rechercher des articles par mot-clé
 - Filtrer par catégorie, auteur ou date
+
+---
+
+## 📚 Documentation Swagger
+
+La documentation interactive de l'API est disponible sur :
+
+```
+http://localhost:3000/api-docs
+```
+
+En production :
+```
+https://api-blog-production-8f83.up.railway.app/api-docs
+```
 
 ---
 
@@ -151,7 +177,10 @@ curl "http://localhost:3000/api/articles/search?query=node"
 | Express.js | Framework web |
 | better-sqlite3 | Base de données SQLite |
 | dotenv | Gestion des variables d'environnement |
+| swagger-ui-express | Interface Swagger |
+| swagger-jsdoc | Génération de la doc depuis les commentaires |
 | nodemon | Rechargement automatique en développement |
+| Railway | Déploiement en production |
 
 ---
 
